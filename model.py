@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
@@ -22,39 +23,27 @@ n_clusters = 3  # Replace with the desired number of clusters
 kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(train_data)
 
 # Step 4: Predictive Scaling or Warming Up
-# Predict cluster for new data point (current metrics)
-new_data_point = normalized_data[-1]  # Replace with your actual new data point
+# Predict cluster for test data points (current metrics)
+test_labels = kmeans.predict(test_data)
 
-predicted_cluster = kmeans.predict(new_data_point.reshape(1, -1))
-
-# Based on the predicted cluster, decide whether to scale up or warm up the function
-scaling_action = False
-warming_up_action = False
+# Based on the predicted cluster, decide whether to scale up or warm up the function for each test data point
+scaling_actions = []
+warming_up_actions = []
 
 # Define thresholds for scaling and warming up actions
 scaling_threshold = 0.75  # Replace with your desired scaling threshold
 warming_up_threshold = 0.5  # Replace with your desired warming up threshold
 
 # Calculate the average metrics for each cluster
-cluster_metrics = np.mean(train_data[kmeans.labels_ == predicted_cluster], axis=0)
+cluster_metrics = np.mean(train_data, axis=0)
 
-# Compare the metrics with the thresholds to determine the actions
-if cluster_metrics[0] > scaling_threshold:
-    scaling_action = True
-
-if cluster_metrics[1] < warming_up_threshold:
-    warming_up_action = True
-
-# Print the determined actions
-if scaling_action:
-    print("Scale up resources for the function")
-else:
-    print("No scaling action needed")
-
-if warming_up_action:
-    print("Warm up the function")
-else:
-    print("No warming up action needed")
+# Determine the actions for each test data point
+for label in test_labels:
+    metrics = test_data[label]
+    scaling_action = metrics[0] > scaling_threshold
+    warming_up_action = metrics[1] < warming_up_threshold
+    scaling_actions.append(scaling_action)
+    warming_up_actions.append(warming_up_action)
 
 # Step 5: Evaluation and Impact Measurement
 # Evaluate the performance of the model using accuracy, precision, and recall metrics
@@ -72,3 +61,17 @@ print("Recall:", recall)
 
 # Measure the impact of scaling or warming up on cold start times, resource utilization, and overall application performance
 # Replace this section with your own impact measurement techniques and calculations
+
+# Generate sample impact data (replace with your actual impact measurements)
+cold_start_times = [2.5, 3.1, 1.8, 2.4, 2.9]
+resource_utilization = [75, 83, 67, 71, 79]
+performance = [87, 92, 84, 88, 90]
+
+# Create a diagram to visualize the impact
+data_points = range(len(cold_start_times))
+
+plt.figure(figsize=(10, 6))
+plt.plot(data_points, cold_start_times, marker='o', label='Cold Start Times')
+plt.plot(data_points, resource_utilization, marker='o', label='Resource Utilization')
+plt.plot(data_points, performance, marker='o', label='Performance')
+plt.xlabel('Data Point')
