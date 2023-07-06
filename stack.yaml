@@ -1,0 +1,9 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://localhost:31112
+functions:
+  mongodb-insert:
+    lang: python3
+    handler: ./
+    image: smsrk/mongodb-insert-function
