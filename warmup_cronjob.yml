@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: function-warm-up
+  namespace: openfaas
+spec:
+  schedule: "*/5 * * * *"  # Adjust the cron schedule as needed
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: function-invoker
+            image: smsrk/function-invoker
+            command: ["python","warmup.py"]  # Replace with the appropriate command
+          restartPolicy: OnFailure
